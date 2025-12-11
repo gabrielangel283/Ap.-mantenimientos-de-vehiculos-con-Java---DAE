@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GananciasA1" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1cf91b99-3a8c-4162-8899-19b4f47b1a1b">
+	<property name="ireport.zoom" value="1.210000000000005"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="72"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#F0EFEF"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="PieChartDataset" uuid="33a67df2-7292-4973-84d8-820599b14700"/>
+	<subDataset name="Top3Ganancias" uuid="caee4e7e-e6c0-4a8d-846a-a4eb4efa0725">
+		<parameter name="ANIO" class="java.lang.Integer"/>
+		<queryString>
+			<![CDATA[SELECT
+    TO_CHAR(c.fecha_pago, 'MM') AS mes_num,
+    CASE TO_CHAR(c.fecha_pago, 'MM')
+        WHEN '01' THEN 'Enero'
+        WHEN '02' THEN 'Febrero'
+        WHEN '03' THEN 'Marzo'
+        WHEN '04' THEN 'Abril'
+        WHEN '05' THEN 'Mayo'
+        WHEN '06' THEN 'Junio'
+        WHEN '07' THEN 'Julio'
+        WHEN '08' THEN 'Agosto'
+        WHEN '09' THEN 'Setiembre'
+        WHEN '10' THEN 'Octubre'
+        WHEN '11' THEN 'Noviembre'
+        WHEN '12' THEN 'Diciembre'
+    END AS mes_nombre,
+    SUM(c.monto_total) AS total_ganancia
+FROM COMPROBANTE c
+WHERE EXTRACT(YEAR FROM c.fecha_pago) = $P{ANIO}
+GROUP BY
+    TO_CHAR(c.fecha_pago, 'MM'),
+    CASE TO_CHAR(c.fecha_pago, 'MM')
+        WHEN '01' THEN 'Enero'
+        WHEN '02' THEN 'Febrero'
+        WHEN '03' THEN 'Marzo'
+        WHEN '04' THEN 'Abril'
+        WHEN '05' THEN 'Mayo'
+        WHEN '06' THEN 'Junio'
+        WHEN '07' THEN 'Julio'
+        WHEN '08' THEN 'Agosto'
+        WHEN '09' THEN 'Setiembre'
+        WHEN '10' THEN 'Octubre'
+        WHEN '11' THEN 'Noviembre'
+        WHEN '12' THEN 'Diciembre'
+    END
+ORDER BY total_ganancia DESC
+LIMIT 3;
+]]>
+		</queryString>
+		<field name="mes_num" class="java.lang.String"/>
+		<field name="mes_nombre" class="java.lang.String"/>
+		<field name="total_ganancia" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="ANIO" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[2025]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_DIR" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="usuario" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+  TO_CHAR(c.fecha_pago, 'MM') AS mes_num,
+  CASE TO_CHAR(c.fecha_pago, 'MM')
+      WHEN '01' THEN 'Enero'
+      WHEN '02' THEN 'Febrero'
+      WHEN '03' THEN 'Marzo'
+      WHEN '04' THEN 'Abril'
+      WHEN '05' THEN 'Mayo'
+      WHEN '06' THEN 'Junio'
+      WHEN '07' THEN 'Julio'
+      WHEN '08' THEN 'Agosto'
+      WHEN '09' THEN 'Setiembre'   -- Perú usa “Setiembre”
+      WHEN '10' THEN 'Octubre'
+      WHEN '11' THEN 'Noviembre'
+      WHEN '12' THEN 'Diciembre'
+  END AS mes_nombre,
+  SUM(c.monto_total) AS total_ganancia
+FROM COMPROBANTE c
+WHERE EXTRACT(YEAR FROM c.fecha_pago) = $P{ANIO}
+GROUP BY
+  TO_CHAR(c.fecha_pago, 'MM'),
+  CASE TO_CHAR(c.fecha_pago, 'MM')
+      WHEN '01' THEN 'Enero'
+      WHEN '02' THEN 'Febrero'
+      WHEN '03' THEN 'Marzo'
+      WHEN '04' THEN 'Abril'
+      WHEN '05' THEN 'Mayo'
+      WHEN '06' THEN 'Junio'
+      WHEN '07' THEN 'Julio'
+      WHEN '08' THEN 'Agosto'
+      WHEN '09' THEN 'Setiembre'
+      WHEN '10' THEN 'Octubre'
+      WHEN '11' THEN 'Noviembre'
+      WHEN '12' THEN 'Diciembre'
+  END
+ORDER BY TO_CHAR(c.fecha_pago, 'MM')::int;
+]]>
+	</queryString>
+	<field name="mes_num" class="java.lang.String"/>
+	<field name="mes_nombre" class="java.lang.String"/>
+	<field name="total_ganancia" class="java.math.BigDecimal"/>
+	<variable name="total_anual" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_ganancia}]]></variableExpression>
+	</variable>
+	<group name="Group1">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/15)]]></groupExpression>
+		<groupFooter>
+			<band height="20">
+				<textField>
+					<reportElement x="588" y="0" width="100" height="20" uuid="8d5d6bc7-ea18-43e8-9248-ee0bcea10e90"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA[$V{total_anual}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="446" y="0" width="142" height="20" uuid="373ba32e-f568-439c-9df2-81075ca6ff7e"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total de ingresos anuales: ]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band height="490" splitType="Stretch">
+			<stackedBar3DChart>
+				<chart>
+					<reportElement mode="Transparent" x="22" y="286" width="356" height="165" uuid="353d0496-db1d-4a24-b653-765665e3b5a4"/>
+					<chartTitle position="Top">
+						<font fontName="Times New Roman" size="15" isBold="true" isItalic="true"/>
+						<titleExpression><![CDATA["Top 3 meses con mayores ingresos"]]></titleExpression>
+					</chartTitle>
+					<chartSubtitle/>
+					<chartLegend position="Bottom"/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<datasetRun subDataset="Top3Ganancias" uuid="201cdfb2-5e0f-4962-95f6-54df406acdc3">
+							<datasetParameter name="ANIO">
+								<datasetParameterExpression><![CDATA[$P{ANIO}]]></datasetParameterExpression>
+							</datasetParameter>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Ganancias"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{mes_nombre}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{total_ganancia}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<bar3DPlot isShowLabels="true">
+					<plot>
+						<seriesColor seriesOrder="0" color="#FF3333"/>
+					</plot>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</bar3DPlot>
+			</stackedBar3DChart>
+			<image>
+				<reportElement x="22" y="85" width="356" height="190" uuid="b7c8e537-3f11-4da2-9e5c-f8cfc8f8b3c3"/>
+				<imageExpression><![CDATA[$P{REPORT_DIR} + "logoempresa.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="22" y="470" width="182" height="20" uuid="e74c1188-26dc-4020-8852-ccdb43d63bc6"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Realizado por: "+$P{usuario}]]></textFieldExpression>
+			</textField>
+		</band>
+	</background>
+	<title>
+		<band height="125" splitType="Stretch">
+			<staticText>
+				<reportElement style="SubTitle" x="403" y="65" width="386" height="29" uuid="55c31c4b-c414-4192-95a8-bd51fb892489"/>
+				<textElement textAlignment="Right">
+					<font size="20" isBold="false"/>
+				</textElement>
+				<text><![CDATA[separado por meses]]></text>
+			</staticText>
+			<frame>
+				<reportElement mode="Opaque" x="-20" y="0" width="822" height="65" forecolor="#006699" backcolor="#FF3333" uuid="90213391-9842-4676-a158-bd70aad9df6f"/>
+				<staticText>
+					<reportElement style="Title" x="356" y="0" width="453" height="65" uuid="acae44cd-13b2-4d04-8311-27a5b50f40f6"/>
+					<textElement textAlignment="Right">
+						<font size="54" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Ganancias anuales]]></text>
+				</staticText>
+			</frame>
+			<staticText>
+				<reportElement mode="Opaque" x="446" y="94" width="356" height="31" forecolor="#FFFFFF" backcolor="#FF3333" uuid="8c9f84cf-6f79-4ee7-b430-ead78ead6c62"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Times New Roman" size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="446" y="94" width="356" height="31" forecolor="#FFFFFF" uuid="b51694dd-a474-4f33-a12a-5e716eaf4f9e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="15" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Ganancias en el "+$P{ANIO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="29">
+			<staticText>
+				<reportElement x="446" y="5" width="142" height="20" uuid="5eba3183-09f2-4e26-9804-c400d372f3b2"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="588" y="5" width="100" height="20" uuid="8dc20f90-ab26-4c3a-a7cf-c02fc353ac3e"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total de ingresos]]></text>
+			</staticText>
+			<line>
+				<reportElement x="446" y="24" width="242" height="1" uuid="4942f4f0-1e35-468c-8190-44b5bbf9fe4e"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="446" y="0" width="142" height="20" uuid="0ddd2ec4-cd50-4349-99c9-a1fb3bf9b7bd"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{mes_nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="588" y="0" width="100" height="20" uuid="9f352d53-4c3f-4f26-9e4f-efed00ba1418"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{total_ganancia}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="446" y="20" width="242" height="1" uuid="29e095aa-a8fc-4775-95fa-b72240f5866f"/>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="16" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="802" height="16" forecolor="#D0B48E" backcolor="#FF3333" uuid="4d8bacb3-0c56-4f17-b8e6-3ab7c70980a0"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="753" y="0" width="40" height="16" forecolor="#FFFFFF" uuid="8f5a2108-0a0d-48c5-b0ad-809cc5acbc9c"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="673" y="0" width="80" height="16" forecolor="#FFFFFF" uuid="5cfb573b-f6c3-42a4-8da5-90eaa12526d7"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Pag "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy h.mm a">
+					<reportElement x="11" y="0" width="101" height="16" forecolor="#FFFFFF" uuid="db393ff7-d252-44af-871b-e97836e10540"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RentabilidadMarcas" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="97deca00-6105-4b16-995e-daade6c8e715">
+	<property name="ireport.zoom" value="1.2100000000000017"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="15"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#F0EFEF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="fecha_ini" class="java.util.Date"/>
+	<parameter name="fecha_fin" class="java.util.Date"/>
+	<parameter name="REPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["src/Reportes/"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 
+            m.nombre_marca,
+            COUNT(c.comprobante_id) as cantidad_atenciones,
+            SUM(c.monto_total) as total_facturado
+        FROM MARCA m
+        INNER JOIN VEHICULO v ON m.marca_id = v.marca_id
+        INNER JOIN ORDEN o ON v.vehiculo_id = o.vehiculo_id
+        INNER JOIN COMPROBANTE c ON o.orden_id = c.orden_id
+        WHERE c.fecha_pago BETWEEN $P{fecha_ini} AND $P{fecha_fin}
+        GROUP BY m.nombre_marca
+        ORDER BY total_facturado DESC
+        LIMIT 15]]>
+	</queryString>
+	<field name="nombre_marca" class="java.lang.String"/>
+	<field name="cantidad_atenciones" class="java.lang.Long"/>
+	<field name="total_facturado" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="144" splitType="Stretch">
+			<frame>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="555" height="101" forecolor="#000000" backcolor="#CC0000" uuid="dfeaae4b-220b-4145-8c87-78ac487471b6"/>
+				<staticText>
+					<reportElement style="Title" positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="181" y="10" width="370" height="50" uuid="8d93d211-58f8-437d-b2b4-a3093818376d"/>
+					<textElement textAlignment="Right">
+						<font size="36" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Rentabilidad por Marca]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="SubTitle" x="250" y="60" width="300" height="29" forecolor="#FFFFFF" uuid="be3a705c-6cc1-488c-afa7-3c1e0229ee4d"/>
+					<textElement textAlignment="Right">
+						<font size="18" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Análisis de Ingresos]]></text>
+				</staticText>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="2" y="112" width="555" height="32" forecolor="#000000" backcolor="#CC0000" uuid="7b1b0efe-6097-44ca-848d-08c851000c76"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="405" y="5" width="144" height="20" forecolor="#FFFFFF" uuid="88763219-39a4-47e4-a1c3-331b0806bdd1"/>
+					<textElement textAlignment="Right">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement style="Column header" x="0" y="10" width="200" height="20" forecolor="#000000" uuid="22d4ef79-096a-46c8-a7a2-f7f94b562129"/>
+				<textElement>
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Marca del Vehículo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="10" width="150" height="20" forecolor="#000000" uuid="b14c0d58-6c19-449b-80fc-f7991c37a4f1"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[N° Atenciones]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="350" y="10" width="200" height="20" forecolor="#000000" uuid="a1049f62-15b6-4737-9b39-a6b6f0797519"/>
+				<textElement textAlignment="Right">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Generado (S/.)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement style="Row" mode="Opaque" x="0" y="0" width="555" height="25" uuid="53d16e8d-8a9d-4876-b6b6-a4c330f81d34"/>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="0" y="0" width="200" height="25" uuid="4fe47161-3633-4616-a12c-eee78d4079b8"/>
+					<textElement verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nombre_marca}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="200" y="0" width="150" height="25" uuid="489995b4-d92e-42e8-93e3-910658fdfe04"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{cantidad_atenciones}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="S/ #,##0.00">
+					<reportElement style="Detail" x="350" y="0" width="200" height="25" uuid="26ea5aef-2053-45db-8402-f322052c8d85"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{total_facturado}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="250" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1" uuid="d283626e-4737-4d76-bf17-098059032742"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="10" width="555" height="20" uuid="f299103b-185e-4903-8256-11f874052321"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Comparativa Visual de Ingresos por Marca]]></text>
+			</staticText>
+			<bar3DChart>
+				<chart>
+					<reportElement x="9" y="40" width="535" height="200" uuid="c77a5a59-f36e-4f22-8fbb-1a27a471bb50"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Ingresos"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{nombre_marca}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{total_facturado}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<bar3DPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</bar3DPlot>
+			</bar3DChart>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="24" forecolor="#D0B48E" backcolor="#000000" uuid="d4f716d6-1fb6-4ab0-a7b5-50cc992a9984"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="513" y="0" width="40" height="20" forecolor="#FFFFFF" uuid="95fb9cfd-d788-48b0-9797-38694c7544b2"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="433" y="0" width="80" height="20" forecolor="#FFFFFF" uuid="52780d5e-e83f-43f8-aaf7-e64d48e82d49"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Column header" x="2" y="1" width="197" height="20" forecolor="#FFFFFF" uuid="65ff378b-4642-4b23-b9dd-a74cb563f262"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="209" y="0" width="224" height="24" forecolor="#FFFFFF" uuid="706899cc-dd10-4ee3-9bd8-75f8693e51c9"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Times New Roman" size="8"/>
+					</textElement>
+					<text><![CDATA[Elaborado por: Diego Ismael Sandoval Paredes - Cód: 231TD35617]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

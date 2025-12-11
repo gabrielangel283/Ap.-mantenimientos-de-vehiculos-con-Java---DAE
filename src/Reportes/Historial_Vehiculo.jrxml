@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Historial_Vehiculo" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="aa074fe4-08c5-4448-90d3-67563f3bbdbf">
+	<property name="ireport.zoom" value="1.100000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="18"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#F0EFEF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="Placa_Param" class="java.lang.String"/>
+	<parameter name="REPORT_DIR" class="java.lang.String" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[SELECT
+    O.orden_id,
+    O.fecha_inicio,
+    U.nombres || ' ' || U.apellidos AS mecanico_asignado,
+    CASE
+        WHEN C.tipo = 'natural' THEN C.nombres || ' ' || COALESCE(C.apellidos, '')
+        ELSE C.nombres
+    END AS nombre_cliente,
+    V.num_placa,
+    'SERVICIO' AS tipo_detalle,
+    S.nombre_servicio AS descripcion_item,
+    DS.precio AS precio_unitario,
+    1 AS cantidad,
+    DS.precio AS subtotal
+FROM
+    ORDEN O
+JOIN VEHICULO V ON O.vehiculo_id = V.vehiculo_id
+JOIN CLIENTE C ON V.cliente_id = C.cliente_id
+JOIN USUARIO U ON O.usuario_id = U.usuario_id
+JOIN DETALLE_SERVICIO DS ON O.orden_id = DS.orden_id
+JOIN SERVICIO S ON DS.servicio_id = S.servicio_id
+WHERE
+    V.num_placa = $P{Placa_Param} -- ¡Cambiado por el parámetro!
+
+UNION ALL
+
+SELECT
+    O.orden_id,
+    O.fecha_inicio,
+    U.nombres || ' ' || U.apellidos AS mecanico_asignado,
+    CASE
+        WHEN C.tipo = 'natural' THEN C.nombres || ' ' || COALESCE(C.apellidos, '')
+        ELSE C.nombres
+    END AS nombre_cliente,
+    V.num_placa,
+    'REPUESTO' AS tipo_detalle,
+    R.nombre_repuesto AS descripcion_item,
+    DR.precio AS precio_unitario,
+    DR.cantidad,
+    DR.cantidad * DR.precio AS subtotal
+FROM
+    ORDEN O
+JOIN VEHICULO V ON O.vehiculo_id = V.vehiculo_id
+JOIN CLIENTE C ON V.cliente_id = C.cliente_id
+JOIN USUARIO U ON O.usuario_id = U.usuario_id
+JOIN DETALLE_REPUESTO DR ON O.orden_id = DR.orden_id
+JOIN REPUESTO R ON DR.repuesto_id = R.repuesto_id
+WHERE
+    V.num_placa = $P{Placa_Param} -- ¡Cambiado por el parámetro!
+
+ORDER BY
+    fecha_inicio, orden_id, tipo_detalle;]]>
+	</queryString>
+	<field name="orden_id" class="java.lang.Integer"/>
+	<field name="fecha_inicio" class="java.sql.Date"/>
+	<field name="mecanico_asignado" class="java.lang.String"/>
+	<field name="nombre_cliente" class="java.lang.String"/>
+	<field name="num_placa" class="java.lang.String"/>
+	<field name="tipo_detalle" class="java.lang.String"/>
+	<field name="descripcion_item" class="java.lang.String"/>
+	<field name="precio_unitario" class="java.math.BigDecimal"/>
+	<field name="cantidad" class="java.lang.Integer"/>
+	<field name="subtotal" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="171" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="2" y="0" width="553" height="83" forecolor="#000000" backcolor="#CC0000" uuid="2638aaa1-812d-42ab-8951-24e426056804"/>
+				<staticText>
+					<reportElement style="Title" x="301" y="0" width="252" height="46" uuid="de4737c1-633c-4ce8-8620-ad9eaa91e52a"/>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font size="30" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Historial de vehiculo]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="SubTitle" x="406" y="46" width="144" height="29" forecolor="#FFFFFF" uuid="4a4ed16f-9b8f-4128-8a7c-c6e20c435c3d"/>
+					<textElement textAlignment="Right">
+						<font size="22" isBold="false"/>
+					</textElement>
+					<text><![CDATA[filtro por placa]]></text>
+				</staticText>
+				<image>
+					<reportElement x="51" y="5" width="135" height="72" uuid="ac73d130-7855-481d-84bd-52bd89551f9c"/>
+					<imageExpression><![CDATA[$P{REPORT_DIR} + "logoempresa.png"]]></imageExpression>
+				</image>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="2" y="98" width="553" height="32" forecolor="#000000" backcolor="#CC0000" uuid="60cfe405-06bc-431d-8036-b6ee34165d5a"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="406" y="12" width="144" height="20" forecolor="#FFFFFF" uuid="b548859c-2536-4bc0-ba93-f05b258cefca"/>
+					<textElement textAlignment="Right">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+			<textField>
+				<reportElement x="437" y="138" width="100" height="20" uuid="7038bc68-6aa7-4004-8931-7bae1d813516"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="15" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="333" y="138" width="100" height="20" uuid="ff652c1c-b139-4766-87ba-389de33f87e4"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="15" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{num_placa}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="33" splitType="Stretch">
+			<staticText>
+				<reportElement x="2" y="0" width="80" height="20" uuid="c258350c-6f02-4d2f-a093-8dbe208e7f5b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<text><![CDATA[N° Orden]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="92" y="0" width="132" height="20" uuid="b33561e2-320b-4b5e-9760-04193bd8abf5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<text><![CDATA[Fecha y Hora]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="224" y="0" width="244" height="20" uuid="83da1666-fc6d-4579-8453-54215a0ff898"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<text><![CDATA[Procedimiento aplicado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="468" y="0" width="84" height="20" uuid="bbc60dd3-dcaf-4d2c-821c-5498e81fa9d1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<text><![CDATA[SubTotal]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="36" splitType="Stretch">
+			<textField>
+				<reportElement x="2" y="16" width="80" height="20" uuid="3cc5ed60-d927-4d9d-9e8b-029ed941ec5e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orden_id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="92" y="16" width="132" height="20" uuid="5c734cec-0184-4a7d-9d32-00b84d0773e0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fecha_inicio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="224" y="16" width="244" height="20" uuid="20d9fb55-6864-4ca3-99c6-d98bf031fe3e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descripcion_item}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="468" y="16" width="87" height="20" uuid="68c0bcaa-38e7-4f89-8fb2-a4e18b1e9929"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="65" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="31" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="24" forecolor="#D0B48E" backcolor="#000000" uuid="1c32898b-d24e-421a-9d66-4e2dedb00b1c"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="513" y="0" width="40" height="20" forecolor="#FFFFFF" uuid="e394b4d6-ca3b-4d01-9c3a-bcab64fb895d"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="433" y="0" width="80" height="20" forecolor="#FFFFFF" uuid="f91f9e87-20d8-4ff6-a59e-9ef1a4848f60"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Column header" x="2" y="1" width="197" height="20" forecolor="#FFFFFF" uuid="974afa61-41dc-4011-9f1d-65a9c09466df"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

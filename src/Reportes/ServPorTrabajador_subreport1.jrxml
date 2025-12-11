@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ServPorTrabajador_subreport1" language="groovy" pageWidth="420" pageHeight="555" orientation="Landscape" columnWidth="420" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="2f62ba2d-a441-4552-ac37-db52e2cdcb1c">
+	<property name="ireport.zoom" value="1.3310000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="fecha_inicio" class="java.util.Date"/>
+	<parameter name="fecha_fin" class="java.util.Date"/>
+        <parameter name="fecha_inicio_str" class="java.lang.String"/>
+        <parameter name="fecha_fin_str" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+    s.nombre_servicio,
+    COUNT(*) AS cantidad,
+    SUM(ds.precio) AS total_generado
+FROM DETALLE_SERVICIO ds
+JOIN SERVICIO s ON ds.servicio_id = s.servicio_id
+JOIN ORDEN o ON ds.orden_id = o.orden_id
+WHERE o.fecha_inicio BETWEEN $P{fecha_inicio} AND $P{fecha_fin}
+AND s.estado=true
+GROUP BY s.nombre_servicio
+ORDER BY cantidad DESC
+LIMIT 3;]]>
+	</queryString>
+	<field name="nombre_servicio" class="java.lang.String"/>
+	<field name="cantidad" class="java.lang.Long"/>
+	<field name="total_generado" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="33" y="12" width="353" height="21" forecolor="#FFFFFF" backcolor="#FF3333" uuid="249d3fd9-4dd0-48bf-be41-72e456f5c59a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Servicios activos en la empresa]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Opaque" x="33" y="33" width="353" height="17" forecolor="#FFFFFF" backcolor="#FF0000" uuid="24267e9a-8e67-4a81-b21d-32ef6ef45bcf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+                                <textFieldExpression><![CDATA[
+                                "(" + $P{fecha_inicio_str} + " - " + $P{fecha_fin_str} + ")"
+                                ]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="24" splitType="Stretch">
+			<staticText>
+				<reportElement x="33" y="1" width="153" height="20" uuid="e1d3020a-7011-465c-b0b8-cc61d092577a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nombre del servicio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="186" y="1" width="100" height="20" uuid="53c768fb-d375-4501-8fd1-30acc67b7b54"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Veces usado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="1" width="100" height="20" uuid="b8d18fe5-22a6-48a8-a9dc-42abf08c37b7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[total_generado]]></text>
+			</staticText>
+			<line>
+				<reportElement x="33" y="21" width="353" height="1" uuid="f6c2e321-6a94-481f-9f3f-de53cb6ab609"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement x="33" y="1" width="153" height="20" uuid="0b2f6f7f-0c90-4372-8dd9-5a2422214621"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre_servicio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="186" y="1" width="100" height="20" uuid="42cc9349-9afb-4099-8e43-192d1fdf949d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="286" y="1" width="100" height="20" uuid="c3a92463-6810-4bd4-8392-eacf96fbca4d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total_generado}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="33" y="21" width="353" height="1" uuid="20ec4df2-273b-454a-ba44-8e1a8f536f50"/>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

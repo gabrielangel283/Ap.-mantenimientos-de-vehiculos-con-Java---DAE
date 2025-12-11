@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportComprobantes" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="97deca00-6105-4b16-995e-daade6c8e715">
+	<property name="ireport.zoom" value="1.464100000000003"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="269"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#F0EFEF"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="Cant_Comprobantes" uuid="bb848674-a634-4069-8dd1-ce7674f433de">
+		<queryString language="SQL">
+			<![CDATA[SELECT tipo_comprobante, COUNT(comprobante_id) AS cantidad_emitida
+FROM COMPROBANTE
+GROUP BY tipo_comprobante;]]>
+		</queryString>
+		<field name="tipo_comprobante" class="java.lang.String"/>
+		<field name="cantidad_emitida" class="java.lang.Long"/>
+	</subDataset>
+	<subDataset name="Ingresos_tipoCliente" uuid="967ddd69-36d1-49c3-aa49-3555be9ac984">
+		<queryString language="SQL">
+			<![CDATA[SELECT
+    C.tipo AS tipo_cliente,
+    SUM(CP.monto_total) AS ingresos_totales
+FROM
+    CLIENTE C
+JOIN
+    COMPROBANTE CP ON C.cliente_id = CP.cliente_id
+GROUP BY
+    C.tipo
+ORDER BY
+    ingresos_totales DESC;]]>
+		</queryString>
+		<field name="tipo_cliente" class="java.lang.String"/>
+		<field name="ingresos_totales" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="Ingresos_tipo_cliente" uuid="d5f4de80-f645-4493-93dd-f99a49febfcd">
+		<queryString language="SQL">
+			<![CDATA[SELECT
+    C.tipo AS tipo_cliente,
+    SUM(CP.monto_total) AS ingresos_totales
+FROM
+    CLIENTE C
+JOIN
+    COMPROBANTE CP ON C.cliente_id = CP.cliente_id
+GROUP BY
+    C.tipo
+ORDER BY
+    ingresos_totales DESC;]]>
+		</queryString>
+		<field name="tipo_cliente" class="java.lang.String"/>
+		<field name="ingresos_totales" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="Gepeto_noesclave" uuid="7770aa57-ca59-4125-b8ff-ce50ef164495">
+		<queryString language="SQL">
+			<![CDATA[SELECT
+    tipo_comprobante,
+    SUM(monto_total) AS ingresos_totales
+FROM
+    COMPROBANTE
+GROUP BY
+    tipo_comprobante
+ORDER BY
+    ingresos_totales DESC;]]>
+		</queryString>
+		<field name="tipo_comprobante" class="java.lang.String"/>
+		<field name="ingresos_totales" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="REPORT_DIR" class="java.lang.String" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[SELECT
+    CASE
+        WHEN C.tipo = 'natural' THEN C.nombres || ' ' || COALESCE(C.apellidos, '')
+        ELSE C.nombres
+    END AS nombre_cliente,
+    C.tipo AS tipo_cliente,
+    SUM(CP.monto_total) AS monto_total_vendido
+FROM
+    CLIENTE C
+JOIN
+    COMPROBANTE CP ON C.cliente_id = CP.cliente_id
+GROUP BY
+    C.cliente_id, C.nombres, C.apellidos, C.tipo
+ORDER BY
+    monto_total_vendido DESC
+LIMIT 7;]]>
+	</queryString>
+	<field name="nombre_cliente" class="java.lang.String"/>
+	<field name="tipo_cliente" class="java.lang.String"/>
+	<field name="monto_total_vendido" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="132" splitType="Stretch">
+			<frame>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="2" y="-18" width="551" height="105" forecolor="#000000" backcolor="#CC0000" uuid="dfeaae4b-220b-4145-8c87-78ac487471b6"/>
+				<staticText>
+					<reportElement style="Title" positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="271" y="18" width="278" height="48" uuid="8d93d211-58f8-437d-b2b4-a3093818376d"/>
+					<textElement>
+						<font size="30" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Top clientes historicos]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="SubTitle" x="324" y="66" width="225" height="29" forecolor="#FFFFFF" uuid="be3a705c-6cc1-488c-afa7-3c1e0229ee4d"/>
+					<textElement>
+						<font size="20" isBold="false"/>
+					</textElement>
+					<text><![CDATA[por comprobantes emitidos]]></text>
+				</staticText>
+				<image>
+					<reportElement x="36" y="5" width="171" height="90" uuid="7b0f7ec3-bb7b-43a0-8145-2de84b412105"/>
+					<imageExpression><![CDATA[$P{REPORT_DIR} + "logoempresa.png"]]></imageExpression>
+				</image>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="2" y="95" width="551" height="33" forecolor="#000000" backcolor="#CC0000" uuid="7b1b0efe-6097-44ca-848d-08c851000c76"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="405" y="10" width="144" height="20" forecolor="#FFFFFF" uuid="88763219-39a4-47e4-a1c3-331b0806bdd1"/>
+					<textElement textAlignment="Right">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="42" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="18" y="5" width="520" height="33" forecolor="#000000" backcolor="#CC0000" uuid="005aebf6-76b6-410a-93f9-20a07e54ef82"/>
+			</frame>
+			<staticText>
+				<reportElement x="97" y="11" width="100" height="20" forecolor="#FFFFFF" uuid="22d4ef79-096a-46c8-a7a2-f7f94b562129"/>
+				<textElement>
+					<font fontName="Times New Roman" size="15" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cliente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="11" width="57" height="20" forecolor="#FFFFFF" uuid="b14c0d58-6c19-449b-80fc-f7991c37a4f1"/>
+				<textElement>
+					<font fontName="Times New Roman" size="15" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="411" y="11" width="94" height="20" forecolor="#FFFFFF" uuid="a1049f62-15b6-4737-9b39-a6b6f0797519"/>
+				<textElement>
+					<font fontName="Times New Roman" size="15" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total vendido]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="45" splitType="Stretch">
+			<textField>
+				<reportElement x="26" y="12" width="206" height="20" uuid="4fe47161-3633-4616-a12c-eee78d4079b8"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="265" y="12" width="78" height="20" uuid="489995b4-d92e-42e8-93e3-910658fdfe04"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tipo_cliente}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="411" y="12" width="100" height="20" uuid="26ea5aef-2053-45db-8402-f322052c8d85"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="15"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{monto_total_vendido}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="26" y="39" width="501" height="1" uuid="5d48ad0e-8b1f-44a3-875a-4ea286867dd3"/>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="163" splitType="Stretch">
+			<pieChart>
+				<chart>
+					<reportElement x="18" y="33" width="255" height="119" uuid="d2761755-5093-4fa2-9901-c7caf12db39d"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<dataset>
+						<datasetRun subDataset="Cant_Comprobantes" uuid="0ccc1a8e-b36b-4e23-a1fd-3fe05c9908ed"/>
+					</dataset>
+					<keyExpression><![CDATA[$F{tipo_comprobante}]]></keyExpression>
+					<valueExpression><![CDATA[$F{cantidad_emitida}]]></valueExpression>
+				</pieDataset>
+				<piePlot isShowLabels="true" labelFormat="{0} ({1})">
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<staticText>
+				<reportElement x="18" y="13" width="255" height="20" uuid="0a7168d8-9773-4713-ac07-fb15ef479b6a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<text><![CDATA[Cantidad de tipos de comprobantes emitidos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="13" width="252" height="20" uuid="2a1cd1be-40f3-4dc7-9d24-e27b17be88b3"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="12"/>
+				</textElement>
+				<text><![CDATA[Cantidad recaudada por tipo de comprobante]]></text>
+			</staticText>
+			<barChart>
+				<chart>
+					<reportElement x="286" y="33" width="252" height="119" uuid="c77a5a59-f36e-4f22-8fbb-1a27a471bb50"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<datasetRun subDataset="Gepeto_noesclave" uuid="d5a3f995-f634-4a72-a526-71b954c4d56a"/>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Tipo clientes"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{tipo_comprobante}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{ingresos_totales}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="27" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="-2" y="0" width="555" height="24" forecolor="#D0B48E" backcolor="#000000" uuid="d4f716d6-1fb6-4ab0-a7b5-50cc992a9984"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="507" y="1" width="40" height="20" forecolor="#FFFFFF" uuid="95fb9cfd-d788-48b0-9797-38694c7544b2"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="427" y="1" width="80" height="20" forecolor="#FFFFFF" uuid="52780d5e-e83f-43f8-aaf7-e64d48e82d49"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Pág. "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Column header" x="2" y="1" width="197" height="20" forecolor="#FFFFFF" uuid="65ff378b-4642-4b23-b9dd-a74cb563f262"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

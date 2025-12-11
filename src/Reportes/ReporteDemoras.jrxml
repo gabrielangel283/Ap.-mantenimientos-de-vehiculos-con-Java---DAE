@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteDemoras" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a1b2c3d4-e5f6-4a5b-9c8d-7e6f5a4b3c2d">
+	<property name="ireport.zoom" value="1.6105100000000017"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#F0EFEF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="p_estado" class="java.lang.String">
+		<defaultValueExpression><![CDATA["en proceso"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["src/Reportes/"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 
+            v.num_placa,
+            m.nombre_marca || ' ' || v.modelo as vehiculo,
+            c.nombres || ' ' || COALESCE(c.apellidos, '') as cliente,
+            u.nombres as mecanico,
+            o.fecha_inicio,
+            (CURRENT_DATE - o.fecha_inicio) as dias_transcurridos
+        FROM ORDEN o
+        INNER JOIN VEHICULO v ON o.vehiculo_id = v.vehiculo_id
+        INNER JOIN MARCA m ON v.marca_id = m.marca_id
+        INNER JOIN CLIENTE c ON v.cliente_id = c.cliente_id
+        LEFT JOIN USUARIO u ON o.usuario_id = u.usuario_id
+        WHERE o.estado = $P{p_estado}
+        ORDER BY dias_transcurridos DESC]]>
+	</queryString>
+	<field name="num_placa" class="java.lang.String"/>
+	<field name="vehiculo" class="java.lang.String"/>
+	<field name="cliente" class="java.lang.String"/>
+	<field name="mecanico" class="java.lang.String"/>
+	<field name="fecha_inicio" class="java.sql.Date"/>
+	<field name="dias_transcurridos" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="132" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="95" backcolor="#CC0000" uuid="d4642220-4737-4d76-bf17-098059032742"/>
+				<staticText>
+					<reportElement style="Title" x="120" y="10" width="430" height="50" uuid="e3831331-5848-5959-6060-717182930415"/>
+					<textElement textAlignment="Right">
+						<font size="32" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Control de Demoras]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="SubTitle" x="250" y="60" width="300" height="29" forecolor="#FFFFFF" uuid="f4942442-6959-6060-7171-828293041526"/>
+					<textElement textAlignment="Right">
+						<font size="18" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Tiempos de Atención en Taller]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="22" y="30" width="200" height="30" forecolor="#FFFFFF" uuid="a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e501"/>
+					<textElement>
+						<font size="16" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Estado: " + $P{p_estado}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Column header" x="12" y="11" width="197" height="20" forecolor="#FFFFFF" uuid="2aec11e4-1757-41ab-8890-8e648b8163d5"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="100" width="555" height="32" forecolor="#000000" backcolor="#CC0000" uuid="b2b2b2b2-c3c3-d4d4-e5e5-f6f6f6f6f602"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="405" y="5" width="144" height="20" forecolor="#FFFFFF" uuid="c3c3c3c3-d4d4-e5e5-f6f6-070707070703"/>
+					<textElement textAlignment="Right">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement style="Column header" x="0" y="10" width="70" height="20" forecolor="#000000" uuid="d4d4d4d4-e5e5-f6f6-0707-181818181804"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Placa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="70" y="10" width="130" height="20" forecolor="#000000" uuid="e5e5e5e5-f6f6-0707-1818-292929292905"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vehículo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="10" width="100" height="20" forecolor="#000000" uuid="f6f6f6f6-0707-1818-2929-303030303006"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mecánico]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="10" width="80" height="20" forecolor="#000000" uuid="07070707-1818-2929-3030-414141414107"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha Ing.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="380" y="10" width="175" height="20" forecolor="#000000" uuid="18181818-2929-3030-4141-525252525208"/>
+				<textElement textAlignment="Right">
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Días Transcurridos]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement style="Row" mode="Opaque" x="0" y="0" width="555" height="25" uuid="29292929-3030-4141-5252-636363636309"/>
+				<textField>
+					<reportElement style="Detail" x="0" y="0" width="70" height="25" uuid="30303030-4141-5252-6363-747474747410"/>
+					<textElement verticalAlignment="Middle">
+						<font size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{num_placa}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="70" y="0" width="130" height="25" uuid="41414141-5252-6363-7474-858585858511"/>
+					<textElement verticalAlignment="Middle">
+						<font size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{vehiculo}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="200" y="0" width="100" height="25" uuid="52525252-6363-7474-8585-969696969612"/>
+					<textElement verticalAlignment="Middle">
+						<font size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{mecanico} == null ? "Por Asignar" : $F{mecanico}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement style="Detail" x="300" y="0" width="80" height="25" uuid="63636363-7474-8585-9696-070707070713"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{fecha_inicio}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Detail" x="380" y="0" width="175" height="25" forecolor="#000000" uuid="74747474-8585-9696-0707-181818181814"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{dias_transcurridos} + " días"]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="1" width="555" height="24" forecolor="#D0B48E" backcolor="#000000" uuid="85858585-9696-0707-1818-292929292915"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="513" y="0" width="40" height="20" forecolor="#FFFFFF" uuid="96969696-0707-1818-2929-303030303016"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="433" y="0" width="80" height="20" forecolor="#FFFFFF" uuid="07070707-1818-2929-3030-414141414117"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Column header" x="2" y="1" width="197" height="20" forecolor="#FFFFFF" uuid="18181818-2929-3030-4141-525252525218"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="209" y="0" width="224" height="24" forecolor="#FFFFFF" uuid="a6c311c4-dd9e-4ab8-a37e-9a1cac1b2134"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Times New Roman" size="8"/>
+					</textElement>
+					<text><![CDATA[Elaborado por: Diego Ismael Sandoval Paredes - Cód: 231TD35617]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="280" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="10" width="555" height="1" uuid="29292929-3030-4141-5252-636363636319"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="20" width="555" height="20" uuid="30303030-4141-5252-6363-747474747420"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vehículos con mayor tiempo de espera]]></text>
+			</staticText>
+			<barChart>
+				<chart>
+					<reportElement x="10" y="50" width="535" height="220" uuid="41414141-5252-6363-7474-858585858521"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Días en Taller"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{num_placa}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{dias_transcurridos}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat>
+							<labelFont>
+								<font fontName="SansSerif" size="10"/>
+							</labelFont>
+						</axisFormat>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+</jasperReport>

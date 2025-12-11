@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c841421-ea22-4c66-a38e-71bf0bc72991">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<parameter name="fecha_ini" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fecha_fin" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_DIR" class="String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 
+    s.servicio_id,
+    s.nombre_servicio,
+    COUNT(ds.orden_id) AS cantidad_ventas,
+    SUM(ds.precio) AS total_generado,
+    AVG(ds.precio) AS precio_promedio,
+    MIN(ds.precio) AS precio_minimo,
+    MAX(ds.precio) AS precio_maximo
+FROM SERVICIO s
+INNER JOIN DETALLE_SERVICIO ds 
+	ON s.servicio_id = ds.servicio_id
+INNER JOIN  ORDEN o 
+	ON ds.orden_id = o.orden_id
+WHERE   o.estado IN ('completado', 'pagado') 
+	AND o.fecha_inicio BETWEEN $P{fecha_ini} AND $P{fecha_fin}
+GROUP BY   s.servicio_id, s.nombre_servicio
+ORDER BY   total_generado DESC
+LIMIT 10;]]>
+	</queryString>
+	<field name="servicio_id" class="java.lang.Integer"/>
+	<field name="nombre_servicio" class="java.lang.String"/>
+	<field name="cantidad_ventas" class="java.lang.Long"/>
+	<field name="total_generado" class="java.math.BigDecimal"/>
+	<field name="precio_promedio" class="java.math.BigDecimal"/>
+	<field name="precio_minimo" class="java.math.BigDecimal"/>
+	<field name="precio_maximo" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="78" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="-20" y="-2" width="596" height="80" forecolor="#006699" backcolor="#FF3333" uuid="4bf663ec-5cda-41bd-8239-0b0f0dedd622"/>
+			</frame>
+			<staticText>
+				<reportElement style="Title" x="2" y="21" width="314" height="33" uuid="cd71b6ae-397a-4f80-bea1-8af0052dd3ef"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Servicios más lucrativos]]></text>
+			</staticText>
+			<image>
+				<reportElement x="384" y="2" width="170" height="70" uuid="6bd1f19a-c7e0-441b-bca2-090c529c997c"/>
+				<imageExpression><![CDATA[$P{REPORT_DIR} + "logoempresa.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="35" width="555" height="1" uuid="6ca156b2-e540-4e47-b640-918da585c158"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement style="Column header" x="0" y="19" width="79" height="15" uuid="cd295636-5c17-4a10-89e2-3c44c8dedac0"/>
+				<textElement markup="none"/>
+				<text><![CDATA[Id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="79" y="19" width="275" height="15" uuid="edc75c5c-38ae-4d20-8aba-9da9e87d3845"/>
+				<textElement markup="none"/>
+				<text><![CDATA[Servicio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="354" y="21" width="79" height="15" uuid="1f6c3e9f-af6b-48bf-819f-231e8c75462d"/>
+				<textElement markup="none"/>
+				<text><![CDATA[#Ventas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="445" y="21" width="108" height="15" uuid="c0078861-eafe-4f01-856a-73595030edfd"/>
+				<textElement markup="none"/>
+				<text><![CDATA[Total generado]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="15" width="555" height="1" uuid="db8e4440-1a03-400e-839b-88ec26a69979"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="79" height="15" uuid="89409005-45d9-4898-a2ab-00aabad02d35"/>
+				<textFieldExpression><![CDATA[$F{servicio_id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="79" y="0" width="275" height="15" uuid="1c30a6a9-4fec-429a-a565-b1f6a6a394da"/>
+				<textFieldExpression><![CDATA[$F{nombre_servicio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="354" y="2" width="79" height="15" uuid="eede19c3-7b9e-48ff-a7cc-c03618a7b6f8"/>
+				<textFieldExpression><![CDATA[$F{cantidad_ventas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="445" y="1" width="108" height="15" uuid="64ea8502-c4f1-4c82-9427-850fd2629f94"/>
+				<textFieldExpression><![CDATA[$F{total_generado}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="4" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1" uuid="d7d85275-527f-4599-8fc7-c87663c02708"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement style="Column header" x="433" y="0" width="80" height="20" uuid="15eccc2b-6946-4b5a-8497-57451ca1d3c0"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="513" y="0" width="40" height="20" uuid="65a1b7c0-f5e6-40ab-a413-1b42f548a31b"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="0" y="0" width="175" height="20" uuid="cbbdfb59-1552-4480-b5ab-a2f7fa5e07ae"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="249" splitType="Stretch">
+			<barChart>
+				<chart>
+					<reportElement x="2" y="24" width="553" height="188" uuid="9166c5b6-497a-4ca3-9c91-6b9417eeb5f6"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Servicios"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{nombre_servicio}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{total_generado}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+</jasperReport>

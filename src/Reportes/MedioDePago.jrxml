@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ad40a07d-dfaf-44c3-84eb-e0fb6bcc1d1f">
+	<property name="ireport.zoom" value="1.2100000000000013"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<parameter name="REPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fecha_ini" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fecha_fin" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 
+    metodo_pago,
+    COUNT(*) AS cantidad_usos,
+    ROUND( (COUNT(*) * 100.0) / SUM(COUNT(*)) OVER (), 2 ) AS porcentaje_uso
+FROM COMPROBANTE
+WHERE fecha_pago BETWEEN $P{fecha_ini} AND $P{fecha_fin}
+GROUP BY  metodo_pago
+ORDER BY porcentaje_uso DESC;]]>
+	</queryString>
+	<field name="metodo_pago" class="java.lang.String"/>
+	<field name="cantidad_usos" class="java.lang.Long"/>
+	<field name="porcentaje_uso" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="99" splitType="Stretch">
+			<staticText>
+				<reportElement style="Title" x="0" y="17" width="406" height="33" uuid="fc100832-4867-4aa3-a71a-b6d00bf5d254"/>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Porcentaje de uso por método]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Title" x="0" y="50" width="406" height="33" uuid="805d98d1-3a6b-4e46-b34a-f554dcafba14"/>
+				<textElement textAlignment="Center" verticalAlignment="Top"/>
+				<text><![CDATA[de pago]]></text>
+			</staticText>
+			<image>
+				<reportElement x="406" y="0" width="149" height="96" uuid="a1d669a7-0bc2-46f0-912c-de847aec60e3"/>
+				<imageExpression><![CDATA[$P{REPORT_DIR} + "logoempresa.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="87" splitType="Stretch">
+			<staticText>
+				<reportElement style="Column header" x="0" y="65" width="185" height="15" uuid="4c04300b-59ff-4d00-9f41-89261256a4ba"/>
+				<text><![CDATA[Método de pago]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="185" y="65" width="185" height="15" uuid="b8cf7bde-865c-4e08-a7a9-a95d4fcf372c"/>
+				<text><![CDATA[#Usos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="370" y="65" width="185" height="15" uuid="c55e630c-63d3-439c-bf3f-c70b6900c7ea"/>
+				<text><![CDATA[Porcentaje de uso]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="27" splitType="Stretch">
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="185" height="15" uuid="96417ba8-5f0a-4e88-af8e-ce4f7ac2cf67"/>
+				<textFieldExpression><![CDATA[$F{metodo_pago}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="185" y="0" width="185" height="15" uuid="c95b76e8-8d0a-4dd7-bc5c-67dde7f1ddf9"/>
+				<textFieldExpression><![CDATA[$F{cantidad_usos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="367" y="0" width="185" height="15" uuid="991db13d-95a0-490d-af36-0a7294a4ea3c"/>
+				<textFieldExpression><![CDATA["".valueOf( $F{porcentaje_uso} ) + "%"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="436" splitType="Stretch">
+			<pieChart>
+				<chart>
+					<reportElement x="0" y="22" width="552" height="369" uuid="ef9f9671-8974-49e2-b5b7-8c127729eede"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{metodo_pago}]]></keyExpression>
+					<valueExpression><![CDATA[$F{porcentaje_uso}]]></valueExpression>
+					<labelExpression><![CDATA["".valueOf( $F{porcentaje_uso} ) + "%"]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement style="Column header" x="430" y="18" width="80" height="20" uuid="805b46cd-82a4-4dc3-975f-8bd6e14ff465"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="512" y="18" width="40" height="20" uuid="ba8e11cb-6940-430e-92c3-3ba230bc77c1"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="0" y="20" width="185" height="20" uuid="d6996367-7324-45f8-a9d7-e2e573076bf2"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
